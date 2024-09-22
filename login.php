@@ -1,5 +1,13 @@
 <?php
 session_start();
+
+if (isset($_SESSION['username'])) {
+    header('Location: home.php');
+    exit;
+}
+
+
+
 $conn = new mysqli('localhost', 'root', '', 'user_auth');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -7,9 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
 
     $result = $conn->query("SELECT * FROM users WHERE username='$username'");
+    //print_r ($result);
+    //die;
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        if ($row['password']) {
+        if (password_verify($password, $row['password'])) {
             $_SESSION['username'] = $username;
             header('Location: home.php');
             exit;
